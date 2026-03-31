@@ -7,11 +7,17 @@ use App\Models\Product;
 
 class ProductController extends Controller
 {
-    public function index()
-    {
-        $products = Product::all();
-        return view('products.index', compact('products'));
-    }
+    
+public function index(Request $request)
+{
+    $search = $request->search;
+
+    $products = Product::when($search, function ($query, $search) {
+        return $query->where('name', 'like', '%' . $search . '%');
+    })->paginate(5);
+
+    return view('products.index', compact('products', 'search'));
+}
 
     public function create()
     {
@@ -20,6 +26,13 @@ class ProductController extends Controller
 
    public function store(Request $request)
 {
+    $request->validate([
+        'name' => 'required',
+        'description' => 'required',
+        'price' => 'required|numeric',
+        'image' => 'nullable|image|mimes:jpg,png,jpeg|max:2048'
+    ]);
+
     $imagePath = null;
 
     if ($request->hasFile('image')) {
@@ -45,7 +58,19 @@ class ProductController extends Controller
 
 public function update(Request $request, $id)
 {
+    $request->validate([
+        'name' => 'required',
+        'description' => 'required',
+        'price' => 'required|numeric',
+        'image' => 'nullable|image|mimes:jpg,png,jpeg|max:2048'
+    ]);
+
     $product = Product::find($id);
+
+    if ($request->hasFile('image')) {
+        $imagePath = $request->file('image')->store('products', 'public');
+        $product->image = $imagePath;
+    }
 
     $product->update([
         'name' => $request->name,
