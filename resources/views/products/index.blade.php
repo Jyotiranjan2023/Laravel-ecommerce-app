@@ -4,10 +4,13 @@
 
 <ul>
 @foreach($products as $product)
-
-
 <li>
     {{ $product->name }} - ₹{{ $product->price }}
+
+    @if($product->image)
+        <br>
+        <img src="{{ asset('storage/' . $product->image) }}" width="100">
+    @endif
 
     <a href="/products/{{ $product->id }}/edit">Edit</a>
 

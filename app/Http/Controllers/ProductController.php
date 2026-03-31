@@ -18,16 +18,23 @@ class ProductController extends Controller
         return view('products.create');
     }
 
-    public function store(Request $request)
-    {
-        Product::create([
-            'name' => $request->name,
-            'description' => $request->description,
-            'price' => $request->price,
-        ]);
+   public function store(Request $request)
+{
+    $imagePath = null;
 
-        return redirect('/products')->with('success', 'Product added successfully');
+    if ($request->hasFile('image')) {
+        $imagePath = $request->file('image')->store('products', 'public');
     }
+
+    Product::create([
+        'name' => $request->name,
+        'description' => $request->description,
+        'price' => $request->price,
+        'image' => $imagePath,
+    ]);
+
+    return redirect('/products')->with('success', 'Product added successfully');
+}
 
 
     public function edit($id)
