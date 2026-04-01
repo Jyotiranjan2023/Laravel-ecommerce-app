@@ -18,7 +18,6 @@ public function index(Request $request)
 
     return view('products.index', compact('products', 'search'));
 }
-
     public function create()
     {
         return view('products.create');
@@ -87,5 +86,11 @@ public function destroy($id)
     $product->delete();
 
     return redirect('/products')->with('success', 'Product deleted');
+}
+
+public function show($id)
+{
+    $product = Product::findOrFail($id);
+    return view('products.show', compact('product'));
 }
 }
